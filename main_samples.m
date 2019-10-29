@@ -1,8 +1,10 @@
 %% Inputs:
 
-data_folder = '/home/muberra/Documents/MATLAB/bcd_energy_comparison/data/ExperimentC/Progress_Population_C';
+data_folder = '/home/muberra/Documents/MATLAB/bcd_energy_comparison/data/ExperimentA';
 output_directory = strcat(data_folder, '/Outputs');
 load(strcat(output_directory,'/population'), 'B2B', 'T2T','B2T');
+
+reference_folder = strcat(data_folder,'/reference_scans');
 
 % B2B: cell Baseline to Baseline energy of differences between signals 
 % T2T: cell Tumour to Tumour energy of differences between signals 
@@ -21,7 +23,17 @@ if save_output
     saveas(gcf,strcat(output_directory,'/population_mean_all.png'))
 end
 
-% Mean over antenna pairs which see tumour
+% Mean over selected antenna pairs 
+fun_reduced_mean = @(x, I) mean(x(I));
+IND = select_signals (reference_folder, 20, windowing, filtering);
+data_B2B = cellfun(@mean,B2B); data_B2B = data_B2B(:); data_B2B = data_B2B(~isnan(data_B2B));
+data_B2T = cellfun(@mean,B2T); data_B2T = data_B2T(:); data_B2T = data_B2T(~isnan(data_B2T));
+compare_means(data_B2B,data_B2T,'onetail')
+if save_output
+    saveas(gcf,strcat(output_directory,'/population_mean_all.png'))
+end
+
+
 
 %% Sample to Sample Analysis
 

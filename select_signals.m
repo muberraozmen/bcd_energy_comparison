@@ -1,7 +1,6 @@
-function select_signals (reference_folder, windowing, filtering)
-
-reference_folder = '/home/muberra/Documents/MATLAB/bcd_energy_comparison/data/reference_scans';
-% Info: Reference folder contains a number of Baseline and Tumour scans 
+function IND = select_signals (reference_folder, n, windowing, filtering)
+% Info: Reference folder contains a number of Baseline and Tumour scans
+% that are reliable and have the same rotation - phantom - plug combination
 
 %% Generate scan pools (filtered) 
 
@@ -57,29 +56,28 @@ end
 clear i j counter;
 
 %% Find antenna pair indices 
-scan_dir = '/home/muberra/Documents/MATLAB/bcd_energy_comparison/data/reference_scans/Baseline1';
-
+scan_dir = strcat(reference_folder,'/Baseline1');
 temp_files = struct2table(dir(scan_dir));
 
 % delete system files
 to_delete = ~(contains(temp_files.name, '.txt') & startsWith(temp_files.name, 'sig'));
 temp_files(to_delete,:) = [];  
-
-scan_files = sortrows(temp_files,'name'); % sort by file name (i.e. antenna pairs as text)
+% sort by file name (i.e. antenna pairs as text)
+scan_files = sortrows(temp_files,'name'); 
 clear temp_files to_delete;
 
-antenna_pair_indices = strings(height(scan_files),2);
+RX_TX = strings(height(scan_files),2);
 for i = 1:height(scan_files)
     temp = strsplit(char(scan_files{i,'name'}), {'A','_'});
-    antenna_pair_indices(i,1) = temp(2);
-    antenna_pair_indices(i,2) = temp(3);
+    RX_TX(i,1) = temp(2);
+    RX_TX(i,2) = temp(3);
 end
 
 %% Sort signals to have high B2T difference but low B2B difference
-% Note: we may use scaling and weights
+% Note: we may wanna use scaling and weights
 evaluated_criteria = sum(B2T,1) - sum(B2B,1);
-[~, I] = maxk(evaluated_criteria, 20);
-antenna_pair_indices(I,:)
-
+[~, IND] = maxk(evaluated_criteria, n);
+disp('Selected antenna pairs: \n')
+RX_TX(IND,:)
 
 end

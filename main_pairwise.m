@@ -52,9 +52,26 @@ results_all.Properties.VariableNames = {'Scans' 'Mean' 'StdDev' 'CI'};
 disp('Pairwise comparisons - mean over all antenna pairs')
 results_all
 
+%% Mean over selected antenna pairs 
+reference_folder = '/home/muberra/Documents/MATLAB/bcd_energy_comparison/data/ExperimentA/reference_scans';
+IND = select_signals (reference_folder, 20, windowing, filtering);
+
+for i = 1:6
+    e_reduced{i} = e{i}(IND);
+    mu_reduced{i} = mean(e_reduced{i});
+    ci_reduced{i} = bootci(100, @mean, e_reduced{i});
+end
+mu_reduced = cellfun(fun_format_1,mu_reduced,'UniformOutput',false);
+ci_reduced = cellfun(fun_format_2,ci_reduced,'UniformOutput',false);
+
+results_reduced = table(scan_pairs',mu_reduced', ci_reduced');
+results_reduced.Properties.VariableNames = {'Scans' 'Mean' 'CI'};
+disp('Pairwise comparisons - mean over selected antenna pairs')
+results_reduced
+
 if save_output
     mkdir (output_directory) % create output folder 
     table2latex(results_all,strcat(output_directory,'/mean_all'));
+    table2latex(results_reduced,strcat(output_directory,'/mean_reduced'));
     save(strcat(output_directory,'/workspace'));
 end
-
