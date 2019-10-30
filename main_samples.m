@@ -22,24 +22,26 @@ compare_means(data_B2B,data_B2T,'onetail')
 if save_output
     saveas(gcf,strcat(output_directory,'/population_mean_all.png'))
 end
+clear data_B2B data_B2T
 
 % Mean over selected antenna pairs 
-fun_reduced_mean = @(x, I) mean(x(I));
+global IND
 IND = select_signals (reference_folder, 20, windowing, filtering);
-data_B2B = cellfun(@mean,B2B); data_B2B = data_B2B(:); data_B2B = data_B2B(~isnan(data_B2B));
-data_B2T = cellfun(@mean,B2T); data_B2T = data_B2T(:); data_B2T = data_B2T(~isnan(data_B2T));
+fun_reduced_mean = @(x) mean(x(IND));
+
+data_B2B = cellfun(@fun_reduced_mean,B2B); data_B2B = data_B2B(:); data_B2B = data_B2B(~isnan(data_B2B));
+data_B2T = cellfun(@fun_reduced_mean,B2T); data_B2T = data_B2T(:); data_B2T = data_B2T(~isnan(data_B2T));
 compare_means(data_B2B,data_B2T,'onetail')
 if save_output
-    saveas(gcf,strcat(output_directory,'/population_mean_all.png'))
+    saveas(gcf,strcat(output_directory,'/population_mean_selected.png'))
 end
-
-
+clear data_B2B data_B2T
 
 %% Sample to Sample Analysis
 
+% Randomly select indices of SCANS for each sample
 num_baseline = size(B2B,1);
 num_tumour = size(T2T,1);
-% randomly select indices for each sample
 sample1_B = sort(randperm(num_baseline, round(num_baseline/2))); sample2_B = setdiff([1:num_baseline],sample1_B);
 sample1_T = sort(randperm(num_tumour, round(num_tumour/2))); sample2_T = setdiff([1:num_tumour],sample1_T);
 
@@ -58,4 +60,22 @@ if save_output
     saveas(gcf,strcat(output_directory,'/samples_diff_mean_all.png'))
 end
 
+clear data1_B2B data1_B2T data2_B2B
+
 % Mean over antenna pairs which see tumour
+data1_B2B = cellfun(@fun_reduced_mean,B2B(sample1_B, sample1_B)); data1_B2B = data1_B2B(:); data1_B2B = data1_B2B(~isnan(data1_B2B));
+data1_B2T = cellfun(@fun_reduced_mean,B2T(sample1_B, sample1_T)); data1_B2T = data1_B2T(:); data1_B2T = data1_B2T(~isnan(data1_B2T));
+data2_B2B = cellfun(@fun_reduced_mean,B2B(sample2_B, sample2_B)); data2_B2B = data2_B2B(:); data2_B2B = data2_B2B(~isnan(data2_B2B));
+
+compare_means(data1_B2B,data2_B2B,'twotails')
+if save_output
+    saveas(gcf,strcat(output_directory,'/samples_same_mean_selected.png'))
+end
+
+compare_means(data1_B2B,data1_B2T,'onetail')
+if save_output
+    saveas(gcf,strcat(output_directory,'/samples_diff_mean_selected.png'))
+end
+
+clear data1_B2B data1_B2T data2_B2B
+clear global IND 

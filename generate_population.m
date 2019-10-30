@@ -1,6 +1,6 @@
 %% Inputs 
 
-data_folder = '/home/muberra/Documents/MATLAB/bcd_energy_comparison/data/ExperimentC/Progress_Population_C';
+data_folder = '/Users/mob/Documents/MATLAB/bcd_energy_comparison/merged_populations/ExperimentA';
 
 windowing.start = 1400; % starting point of signal (requires calculation)
 windowing.length = 1000; % total length of signal (requires calculation)
