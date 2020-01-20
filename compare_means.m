@@ -1,5 +1,5 @@
 function compare_means(data1,data2,type)
-nboot = 10000;
+nboot = 1000;
 alpha = .05;
 
 fun_delta_mean = @(x1,x2) mean(x1)-mean(x2);
