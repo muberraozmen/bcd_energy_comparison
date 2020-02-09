@@ -1,4 +1,4 @@
-function IND = select_signals (reference_folder, n, windowing, filtering)
+function IND = select_signals_reference (reference_folder, n, windowing, filtering)
 % Info: Reference folder contains a number of Baseline and Tumour scans
 % that are reliable and have the same rotation - phantom - plug combination
 

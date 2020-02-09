@@ -1,6 +1,21 @@
-function compare_means(data1,data2,type)
+function cool = compare_means(comp1,comp2,IND,type)
+
+% Calculate the average over a preferred set of signals indicated by IND
+
+fun_reduced_mean = @(x) mean(x(IND));
+
+data1 = comp1(:); 
+data1 = data1(~cellfun(@isempty, data1)); 
+data1 = cellfun(fun_reduced_mean,data1);
+
+data2 = comp2(:); 
+data2 = data2(~cellfun(@isempty, data2)); 
+data2 = cellfun(fun_reduced_mean,data2);
+
+% Bootstrapping 
+
 nboot = 10000;
-alpha = .05;
+alpha = .20;
 
 fun_delta_mean = @(x1,x2) mean(x1)-mean(x2);
 
@@ -28,8 +43,10 @@ if strcmp(type,'onetail')
     legend([h1,h2,h3],{'observed mean','critical value','tested value'},'Location','NorthEast');
     if critical_value<=0
         title('Reject H0'); 
+        cool = 1;
     else
         title('Fail to reject H0'); 
+        cool = 0;
     end
 end
 if strcmp(type,'twotails')
@@ -48,8 +65,10 @@ if strcmp(type,'twotails')
     legend([h1,h2,h3],{'observed mean','critical values','tested value'},'Location','NorthEast');
     if (critical_values(1)>0 || critical_values(2)<0)
         title('Reject H0'); 
+        cool = 0;
     else
-        title('Fail to reject H0'); 
+        title('Fail to reject H0');
+        cool = 1;
     end
 end
 
